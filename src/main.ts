@@ -3,7 +3,8 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
+  app.setGlobalPrefix('auth');
   /* 启动swagger */
   const options = new DocumentBuilder()
     .addBearerAuth() // 开启 BearerAuth 授权认证
