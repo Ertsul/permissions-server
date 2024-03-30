@@ -14,8 +14,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forRootAsync({
       imports: [NestConfigModule],
       useFactory: async (configService: CustomConfigService) => {
-        // console.log('>> __dirname :', cwd, __dirname);
-        console.log('>> configService.isProd :', configService.isProd);
         const workDir = process.cwd() + '/dist';
         return {
           type: configService.dataBaseType as any,
