@@ -10,8 +10,7 @@ export class ConfigService {
   }
 
   get isProd(): boolean {
-    console.log('>> this.env :', this.env);
-    return this.nestConfigService.get<string>('NODE_ENV') === 'production';
+    return this.env === 'production';
   }
 
   get dataBaseHost(): string {
