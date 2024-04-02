@@ -7,7 +7,6 @@ import { PermissionsModule } from './module/permissions/permissions.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
 import { LoggerModule } from './module/logger/logger.module';
-import { RoleController } from './module/role/role.controller';
 import { RoleModule } from './module/role/role.module';
 
 @Module({
