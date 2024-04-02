@@ -6,9 +6,10 @@ import { ConfigModule } from './module/config/config.module';
 import { PermissionsModule } from './module/permissions/permissions.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './shared/interceptors/response.interceptor';
+import { LoggerModule } from './module/logger/logger.module';
 
 @Module({
-  imports: [ConfigModule, PermissionsModule],
+  imports: [ConfigModule, PermissionsModule, LoggerModule],
   controllers: [AppController],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
