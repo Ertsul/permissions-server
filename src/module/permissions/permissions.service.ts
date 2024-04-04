@@ -6,23 +6,6 @@ import { PermissionsEntity } from './permissions.entity';
 import { filterObjectDataByKeys } from 'src/shared/utils';
 import { CreatePermissionsDto } from './permissions.dto';
 
-const fields = [
-  'name',
-  'type',
-  'icon',
-  'component',
-  'routerName',
-  'routerPath',
-  'redirectUrl',
-  'permissionsKey',
-  'permissionsApi',
-  'permissionsApiIsRegex',
-  'permissionsMethods',
-  'sort',
-  'visible',
-  'parentId',
-];
-
 @Injectable()
 export class PermissionsService {
   constructor(
@@ -32,8 +15,7 @@ export class PermissionsService {
   ) {}
 
   async createPermissions(data: CreatePermissionsDto) {
-    const insertData = filterObjectDataByKeys({ keys: fields, data });
-    await this.permissionsRepository.save(insertData);
+    await this.permissionsRepository.save(data);
   }
 
   async deleteById(id: number) {
@@ -43,14 +25,7 @@ export class PermissionsService {
 
   async updatePermissions(id: number, data: CreatePermissionsDto) {
     const oldData = await this.queryDetailById(id);
-    const targetData = filterObjectDataByKeys({
-      keys: fields,
-      data: {
-        ...oldData,
-        ...data,
-      },
-    });
-    await this.permissionsRepository.update(id, targetData);
+    await this.permissionsRepository.update(id, { ...oldData, ...data });
   }
 
   async queryDetailById(id: number) {

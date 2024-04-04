@@ -59,18 +59,19 @@ export class RoleService {
       name: data.name,
     });
     const { permissions = '', ...newData } = data || {};
-    let oldData: any = await this.queryDetailById(id);
-    oldData = {
-      ...oldData,
+    let targetData: any = await this.queryDetailById(id);
+    targetData = {
+      ...targetData,
       ...newData,
     };
+    targetData.permissions = [];
     if (permissions) {
       const permissionsData = await this.permissionsRepository.findBy({
         id: In(permissions.split(',')),
       });
-      oldData.permissions = permissionsData;
+      targetData.permissions = permissionsData;
     }
-    await this.roleRepository.save(oldData);
+    await this.roleRepository.save(targetData);
   }
 
   async queryDetailById(id: number) {

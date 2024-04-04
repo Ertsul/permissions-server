@@ -6,8 +6,6 @@ import { ConfigService } from '../config/config.service';
 import { CreateUserDto } from './user.dto';
 import { filterObjectDataByKeys } from 'src/shared/utils';
 
-const fields = ['username', 'password', 'status'];
-
 @Injectable()
 export class UserService {
   constructor(
@@ -17,8 +15,7 @@ export class UserService {
   ) {}
 
   async createUser(data: CreateUserDto) {
-    const insertData = filterObjectDataByKeys({ keys: fields, data });
-    await this.userRepository.save(insertData);
+    await this.userRepository.save(data);
   }
 
   async deleteById(id: number) {
@@ -28,14 +25,7 @@ export class UserService {
 
   async updateUser(id: number, data: CreateUserDto) {
     const oldData = await this.queryDetailById(id);
-    const targetData = filterObjectDataByKeys({
-      keys: fields,
-      data: {
-        ...oldData,
-        ...data,
-      },
-    });
-    await this.userRepository.update(id, targetData);
+    await this.userRepository.update(id, { ...oldData, ...data });
   }
 
   async queryDetailById(id: number) {
