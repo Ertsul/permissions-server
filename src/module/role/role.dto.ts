@@ -34,4 +34,7 @@ export class CreateRoleDto {
 
   @IsInt()
   isRoot: number;
+
+  @IsString()
+  permissions: string;
 }

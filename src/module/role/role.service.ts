@@ -1,24 +1,51 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleEntity } from './role.entity';
-import { Repository } from 'typeorm';
+import { FindOperator, In, Not, Repository } from 'typeorm';
 import { ConfigService } from '../config/config.service';
 import { CreateRoleDto } from './role.dto';
-import { filterObjectDataByKeys } from 'src/shared/utils';
+import {
+  PERMISSIONS_TABLE,
+  PermissionsEntity,
+} from '../permissions/permissions.entity';
 
-const fields = ['name', 'status', 'isRoot', 'permissions'];
+type NameExistType = { name: string; id?: FindOperator<number> };
 
 @Injectable()
 export class RoleService {
   constructor(
     @InjectRepository(RoleEntity)
     private roleRepository: Repository<RoleEntity>,
+    @InjectRepository(PermissionsEntity)
+    private permissionsRepository: Repository<PermissionsEntity>,
     private readonly configService: ConfigService,
   ) {}
 
+  async judgeNameIsExist(options: NameExistType) {
+    const nameExist = await this.roleRepository.findBy(options);
+    if (nameExist && nameExist.length) {
+      throw new HttpException('name 已存在', HttpStatus.BAD_REQUEST);
+    }
+  }
+
   async createRole(data: CreateRoleDto) {
-    const insertData = filterObjectDataByKeys({ keys: fields, data });
-    await this.roleRepository.save(insertData);
+    await this.judgeNameIsExist({ name: data.name });
+    const { permissions = '', ...insertData } = data || {};
+    const roleData: any = await this.roleRepository.create(
+      insertData as RoleEntity,
+    );
+    if (permissions) {
+      const permissionsData = await this.permissionsRepository.findBy({
+        id: In(permissions.split(',')),
+      });
+      roleData.permissions = permissionsData;
+    }
+    await this.roleRepository.save(roleData);
   }
 
   async deleteById(id: number) {
@@ -27,19 +54,30 @@ export class RoleService {
   }
 
   async updateRole(id: number, data: CreateRoleDto) {
-    const oldData = await this.queryDetailById(id);
-    const targetData = filterObjectDataByKeys({
-      keys: fields,
-      data: {
-        ...oldData,
-        ...data,
-      },
+    await this.judgeNameIsExist({
+      id: Not(id),
+      name: data.name,
     });
-    await this.roleRepository.update(id, targetData);
+    const { permissions = '', ...newData } = data || {};
+    let oldData: any = await this.queryDetailById(id);
+    oldData = {
+      ...oldData,
+      ...newData,
+    };
+    if (permissions) {
+      const permissionsData = await this.permissionsRepository.findBy({
+        id: In(permissions.split(',')),
+      });
+      oldData.permissions = permissionsData;
+    }
+    await this.roleRepository.save(oldData);
   }
 
   async queryDetailById(id: number) {
-    const data = await this.roleRepository.findOne({ where: { id } });
+    const data = await this.roleRepository.findOne({
+      where: { id },
+      relations: [PERMISSIONS_TABLE],
+    });
     if (!data) {
       throw new NotFoundException(`ID ${id} not found`);
     }
