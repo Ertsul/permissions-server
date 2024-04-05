@@ -105,4 +105,11 @@ export class UserController {
       data: HttpMessage.SUCCESS,
     } as CommonResponseType);
   }
+
+  @Post('logout')
+  async logout(@Res() res: any) {
+    const token = this.tokenService.getTokenFromCookie(res);
+    this.tokenService.deleteTokenInCookie(res);
+    await this.tokenService.deleteByToken(token);
+  }
 }

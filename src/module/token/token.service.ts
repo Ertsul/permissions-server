@@ -44,7 +44,7 @@ export class TokenService {
     response.cookie(this.configService.tokenNameInCookies, token, {
       httpOnly: false,
       expires: new Date(timestamp),
-    })
+    });
   }
 
   deleteTokenInCookie(response: any) {
