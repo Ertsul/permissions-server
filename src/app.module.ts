@@ -9,9 +9,20 @@ import { ResponseInterceptor } from './shared/interceptors/response.interceptor'
 import { LoggerModule } from './module/logger/logger.module';
 import { RoleModule } from './module/role/role.module';
 import { UserModule } from './module/user/user.module';
+import { SessionMiddleware } from './middleware/session/session.middleware';
+import { VerificationCodeModule } from './module/verification-code/verification-code.module';
+import { TokenModule } from './module/token/token.module';
 
 @Module({
-  imports: [ConfigModule, PermissionsModule, LoggerModule, RoleModule, UserModule],
+  imports: [
+    ConfigModule,
+    PermissionsModule,
+    LoggerModule,
+    RoleModule,
+    UserModule,
+    VerificationCodeModule,
+    TokenModule,
+  ],
   controllers: [AppController],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
@@ -21,5 +32,6 @@ import { UserModule } from './module/user/user.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(SessionMiddleware).forRoutes('*');
   }
 }

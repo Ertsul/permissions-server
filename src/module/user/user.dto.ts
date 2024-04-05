@@ -57,3 +57,14 @@ export class ChangeUserPasswordDto {
   @IsString()
   newPassword: string;
 }
+
+export class LoginDto {
+  @IsString()
+  username: string;
+
+  @IsString()
+  password: string;
+
+  @IsString()
+  verificationCode: string;
+}

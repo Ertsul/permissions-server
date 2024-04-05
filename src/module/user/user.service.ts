@@ -11,6 +11,7 @@ import { ConfigService } from '../config/config.service';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
 import { ROLE_TABLE, RoleEntity } from '../role/role.entity';
 import * as bcrypt from 'bcrypt';
+import { PERMISSIONS_TABLE } from '../permissions/permissions.entity';
 
 type NameExistType = { username: string; id?: FindOperator<number> };
 
@@ -86,16 +87,31 @@ export class UserService {
     await this.userRepository.save(data);
   }
 
-  async queryDetailById(id: number, password: boolean = false) {
+  async queryDetailById(
+    id: number,
+    password: boolean = false,
+    permissions: boolean = false,
+  ) {
     const select: any = ['id', 'username', 'status', 'role'];
     password && select.push('password');
+    const relations = [ROLE_TABLE, `${ROLE_TABLE}.${PERMISSIONS_TABLE}`];
     const data = await this.userRepository.findOne({
       select,
       where: { id },
-      relations: [ROLE_TABLE],
+      relations,
     });
     if (!data) {
       throw new NotFoundException(`ID ${id} not found`);
+    }
+    return data;
+  }
+
+  async queryDetailByUsername(username: string = '') {
+    const data = await this.userRepository.findOne({
+      where: { username },
+    });
+    if (!data) {
+      throw new NotFoundException(`Username ${username} not found`);
     }
     return data;
   }

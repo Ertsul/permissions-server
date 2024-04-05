@@ -36,4 +36,20 @@ export class ConfigService {
   get dataBaseType(): string {
     return this.nestConfigService.get<string>('DATABASE_TYPE');
   }
+
+  get maxTokenCount(): number {
+    return this.nestConfigService.get<number>('MAX_TOKEN_COUNT_SAMETIME')
+  }
+
+  get jwtSecretKey(): string {
+    return this.nestConfigService.get<string>('JWT_SECRET_KEY');
+  }
+
+  get jwtExpiresIn(): string {
+    return this.nestConfigService.get<string>('JWT_EXPIRES_IN');
+  }
+
+  get tokenNameInCookies(): string {
+    return this.nestConfigService.get<string>('TOKEN_NAME_IN_COOKIES')
+  }
 }
