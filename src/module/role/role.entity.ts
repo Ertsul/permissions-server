@@ -9,7 +9,9 @@ import {
 } from 'typeorm';
 import { PermissionsEntity } from '../permissions/permissions.entity';
 
-@Entity('role')
+export const ROLE_TABLE = 'role';
+
+@Entity(ROLE_TABLE)
 export class RoleEntity {
   @PrimaryGeneratedColumn()
   id: number;

@@ -8,10 +8,14 @@ import { UserEntity } from './user.entity';
 import { FindOperator, In, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '../config/config.service';
-import { CreateUserDto } from './user.dto';
-import { RoleEntity } from '../role/role.entity';
+import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { ROLE_TABLE, RoleEntity } from '../role/role.entity';
+import * as bcrypt from 'bcrypt';
 
 type NameExistType = { username: string; id?: FindOperator<number> };
+
+const getHashedPassword = async (password: string = '') =>
+  await bcrypt.hash(password, 11);
 
 @Injectable()
 export class UserService {
@@ -19,7 +23,7 @@ export class UserService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     @InjectRepository(RoleEntity)
-    private rolesRepository: Repository<RoleEntity>,
+    private roleRepository: Repository<RoleEntity>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -32,15 +36,16 @@ export class UserService {
 
   async createUser(data: CreateUserDto) {
     await this.judgeNameIsExist({ username: data.username });
-    const { roles = '', ...insertData } = data || {};
+    const { role = '', ...insertData } = data || {};
     const userData: any = await this.userRepository.create(
       insertData as RoleEntity,
     );
-    if (roles) {
-      const rolesData = await this.rolesRepository.findBy({
-        id: In(roles.split(',')),
+    userData.password = await getHashedPassword(data.password);
+    if (role) {
+      const roleData = await this.roleRepository.findBy({
+        id: In(role.split(',')),
       });
-      userData.roles = rolesData;
+      userData.role = roleData;
     }
     await this.userRepository.save(userData);
   }
@@ -50,29 +55,45 @@ export class UserService {
     await this.userRepository.delete({ id });
   }
 
-  async updateUser(id: number, data: CreateUserDto) {
+  async updateUser(id: number, data: UpdateUserDto) {
     await this.judgeNameIsExist({
       id: Not(id),
       username: data.username,
     });
-    const { roles = '', ...newData } = data || {};
+    const { role = '', ...newData } = data || {};
     let targetData: any = await this.queryDetailById(id);
     targetData = {
       ...targetData,
       ...newData,
     };
-    targetData.roles = [];
-    if (roles) {
-      const rolesData = await this.rolesRepository.findBy({
-        id: In(roles.split(',')),
+    targetData.role = [];
+    if (role) {
+      const roleData = await this.roleRepository.findBy({
+        id: In(role.split(',')),
       });
-      targetData.roles = rolesData;
+      targetData.role = roleData;
     }
     await this.userRepository.save(targetData);
   }
 
-  async queryDetailById(id: number) {
-    const data = await this.userRepository.findOne({ where: { id } });
+  async updatePassword({ id, oldPassword, newPassword }) {
+    const data = await this.queryDetailById(id, true);
+    const match = await bcrypt.compare(oldPassword, data.password);
+    if (!match) {
+      throw new HttpException('密码错误', HttpStatus.BAD_REQUEST);
+    }
+    data.password = await getHashedPassword(newPassword);
+    await this.userRepository.save(data);
+  }
+
+  async queryDetailById(id: number, password: boolean = false) {
+    const select: any = ['id', 'username', 'status', 'role'];
+    password && select.push('password');
+    const data = await this.userRepository.findOne({
+      select,
+      where: { id },
+      relations: [ROLE_TABLE],
+    });
     if (!data) {
       throw new NotFoundException(`ID ${id} not found`);
     }
@@ -80,7 +101,10 @@ export class UserService {
   }
 
   async queryList() {
-    const data = await this.userRepository.find();
+    const data = await this.userRepository.find({
+      select: ['id', 'username', 'status', 'role'],
+      relations: [ROLE_TABLE],
+    });
     return data;
   }
 }

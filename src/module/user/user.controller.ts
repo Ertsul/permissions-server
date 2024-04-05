@@ -10,7 +10,11 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { HttpMessage } from 'src/shared/constant';
-import { CreateUserDto } from './user.dto';
+import {
+  ChangeUserPasswordDto,
+  CreateUserDto,
+  UpdateUserDto,
+} from './user.dto';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -39,7 +43,7 @@ export class UserController {
   @Put(':id')
   async updateById(
     @Param('id') id: number,
-    @Body() data: CreateUserDto,
+    @Body() data: UpdateUserDto,
   ): Promise<string> {
     await this.userService.updateUser(id, data);
     return HttpMessage.SUCCESS;
@@ -48,6 +52,15 @@ export class UserController {
   @Delete(':id')
   async deleteById(@Param('id') id: number): Promise<string> {
     await this.userService.deleteById(id);
+    return HttpMessage.SUCCESS;
+  }
+
+  @Post('/change-password/:id')
+  async updatePassword(
+    @Param('id') id: number,
+    @Body() data: ChangeUserPasswordDto,
+  ): Promise<string> {
+    await this.userService.updatePassword({ id, ...data });
     return HttpMessage.SUCCESS;
   }
 }

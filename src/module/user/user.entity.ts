@@ -25,7 +25,7 @@ export class UserEntity {
 
   @ManyToMany(() => RoleEntity)
   @JoinTable({ name: 'user_role_rel' })
-  roles: RoleEntity[];
+  role: RoleEntity[];
 
   @CreateDateColumn()
   createAt: Date;

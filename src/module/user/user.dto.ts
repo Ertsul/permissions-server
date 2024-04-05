@@ -12,6 +12,9 @@ export class UserDto {
   @IsString()
   password: string;
 
+  @IsString()
+  role: string;
+
   @IsInt()
   status: number;
 
@@ -33,5 +36,24 @@ export class CreateUserDto {
   password: string;
 
   @IsString()
-  roles: string;
+  role: string;
+}
+
+export class UpdateUserDto {
+  @IsString()
+  username: string;
+
+  @IsInt()
+  status: number;
+
+  @IsString()
+  role: string;
+}
+
+export class ChangeUserPasswordDto {
+  @IsString()
+  oldPassword: string;
+
+  @IsString()
+  newPassword: string;
 }
