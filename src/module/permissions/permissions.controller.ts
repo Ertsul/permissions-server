@@ -10,7 +10,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreatePermissionsDto } from './permissions.dto';
 import { PermissionsService } from './permissions.service';
-import { HttpMessage } from 'src/shared/constant';
+import { HttpMessage } from '../../shared/constant';
 
 @ApiBearerAuth()
 @ApiTags('permissions')

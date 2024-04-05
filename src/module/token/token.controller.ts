@@ -1,18 +1,6 @@
-import * as bcrypt from 'bcrypt';
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  Body,
-  Req,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { HttpMessage } from 'src/shared/constant';
+import { HttpMessage } from '../../shared/constant';
 import { TokenService } from './token.service';
 import { CreateTokenDto, UpdateTokenDto } from './token.dto';
 
@@ -20,7 +8,7 @@ import { CreateTokenDto, UpdateTokenDto } from './token.dto';
 @ApiTags('token')
 @Controller('token')
 export class TokenController {
-  constructor(private readonly tokenService: TokenService) { }
+  constructor(private readonly tokenService: TokenService) {}
 
   @Get('/user-id/:user-id')
   async queryPermissionsById(@Param('user-id') userId: number) {

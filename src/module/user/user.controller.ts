@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { HttpMessage } from 'src/shared/constant';
+import { HttpMessage } from '../../shared/constant';
 import {
   ChangeUserPasswordDto,
   CreateUserDto,
@@ -23,7 +23,7 @@ import {
   UpdateUserDto,
 } from './user.dto';
 import { TokenService } from '../token/token.service';
-import { CommonResponseType } from 'src/shared/interceptors/response.interceptor';
+import { CommonResponseType } from '../../shared/interceptors/response.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('user')

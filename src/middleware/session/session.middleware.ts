@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import * as session from 'express-session';
-import { ConfigService } from 'src/module/config/config.service';
+import { ConfigService } from '../../module/config/config.service';
 
 @Injectable()
 export class SessionMiddleware implements NestMiddleware {

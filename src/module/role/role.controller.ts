@@ -10,7 +10,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './role.dto';
-import { HttpMessage } from 'src/shared/constant';
+import { HttpMessage } from '../../shared/constant';
 
 @ApiBearerAuth()
 @ApiTags('role')

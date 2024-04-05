@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '../config/config.service';
 import { PermissionsEntity } from './permissions.entity';
-import { filterObjectDataByKeys } from 'src/shared/utils';
 import { CreatePermissionsDto } from './permissions.dto';
 
 @Injectable()
