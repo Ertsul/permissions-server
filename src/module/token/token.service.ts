@@ -35,8 +35,8 @@ export class TokenService {
     return token;
   }
 
-  getTokenFromCookie(response: any) {
-    return response.cookies.get(this.configService.tokenNameInCookies) || '';
+  getTokenFromCookie(request: any) {
+    return request.cookies[this.configService.tokenNameInCookies] || '';
   }
 
   setTokenToCookie(response: any, token: string) {
@@ -48,7 +48,7 @@ export class TokenService {
   }
 
   deleteTokenInCookie(response: any) {
-    this.setTokenToCookie(response, '');
+    response.cookie(this.configService.tokenNameInCookies, '');
   }
 
   analyzeToken(token: string) {

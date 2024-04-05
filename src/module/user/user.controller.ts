@@ -34,37 +34,43 @@ export class UserController {
     private readonly tokenService: TokenService,
   ) {}
 
-  @Get('list')
-  async queryList() {
-    const data = await this.userService.queryList();
-    return data;
-  }
-
-  @Get(':id')
-  async queryPermissionsById(@Param('id') id: number) {
-    const data = await this.userService.queryDetailById(id);
-    return data;
-  }
-
-  @Post()
-  async create(@Body() data: CreateUserDto): Promise<string> {
-    await this.userService.createUser(data);
-    return HttpMessage.SUCCESS;
-  }
-
-  @Put(':id')
-  async updateById(
-    @Param('id') id: number,
-    @Body() data: UpdateUserDto,
-  ): Promise<string> {
-    await this.userService.updateUser(id, data);
-    return HttpMessage.SUCCESS;
-  }
-
-  @Delete(':id')
-  async deleteById(@Param('id') id: number): Promise<string> {
-    await this.userService.deleteById(id);
-    return HttpMessage.SUCCESS;
+  @Get('me')
+  async queryLoginUser(@Session() session: any) {
+    const userId = session.userId || 1;
+    const data = await this.userService.queryDetailById(userId, false, true);
+    if (!data) {
+      throw new HttpException('未知用户', HttpStatus.BAD_REQUEST);
+    }
+    let isRootRole = false;
+    const { role, ...restData } = data;
+    const roleInUse = [];
+    const permissionsInUse = {};
+    role.forEach((roleItem) => {
+      const {
+        id,
+        name,
+        status,
+        isRoot = false,
+        permissions = [],
+      } = roleItem || {};
+      if (status) {
+        roleInUse.push({ id, name });
+        isRoot && (isRootRole = true);
+        if (permissions && permissions.length) {
+          permissions.forEach((permissionsItem) => {
+            if (!(permissionsItem.id in Object.keys(permissionsInUse))) {
+              permissionsInUse[permissionsItem.id] = permissionsItem;
+            }
+          });
+        }
+      }
+    });
+    return {
+      ...restData,
+      isRootRole,
+      role: roleInUse,
+      permissions: Object.values(permissionsInUse),
+    };
   }
 
   @Post('/change-password/:id')
@@ -99,7 +105,7 @@ export class UserController {
     const token = await this.tokenService.genToken(userId);
     await this.tokenService.insertToken({ token, userId });
     this.tokenService.setTokenToCookie(res, token);
-    return res.send({
+    res.send({
       code: HttpStatus.OK,
       message: 'Success',
       data: HttpMessage.SUCCESS,
@@ -107,9 +113,49 @@ export class UserController {
   }
 
   @Post('logout')
-  async logout(@Res() res: any) {
-    const token = this.tokenService.getTokenFromCookie(res);
+  async logout(@Req() req: any, @Res() res: any) {
+    const token = this.tokenService.getTokenFromCookie(req);
+    console.log('>> token :', token);
+    if (!token) return HttpMessage.SUCCESS;
     this.tokenService.deleteTokenInCookie(res);
     await this.tokenService.deleteByToken(token);
+    res.send({
+      code: HttpStatus.OK,
+      message: 'Success',
+      data: HttpMessage.SUCCESS,
+    } as CommonResponseType);
+  }
+
+  @Get('list')
+  async queryList() {
+    const data = await this.userService.queryList();
+    return data;
+  }
+
+  @Get(':id')
+  async queryPermissionsById(@Param('id') id: number) {
+    const data = await this.userService.queryDetailById(id);
+    return data;
+  }
+
+  @Post()
+  async create(@Body() data: CreateUserDto): Promise<string> {
+    await this.userService.createUser(data);
+    return HttpMessage.SUCCESS;
+  }
+
+  @Put(':id')
+  async updateById(
+    @Param('id') id: number,
+    @Body() data: UpdateUserDto,
+  ): Promise<string> {
+    await this.userService.updateUser(id, data);
+    return HttpMessage.SUCCESS;
+  }
+
+  @Delete(':id')
+  async deleteById(@Param('id') id: number): Promise<string> {
+    await this.userService.deleteById(id);
+    return HttpMessage.SUCCESS;
   }
 }
