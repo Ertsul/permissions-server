@@ -94,7 +94,8 @@ export class UserService {
   ) {
     const select: any = ['id', 'username', 'status', 'role'];
     password && select.push('password');
-    const relations = [ROLE_TABLE, `${ROLE_TABLE}.${PERMISSIONS_TABLE}`];
+    const relations = [ROLE_TABLE];
+    permissions && relations.push(`${ROLE_TABLE}.${PERMISSIONS_TABLE}`);
     const data = await this.userRepository.findOne({
       select,
       where: { id },
