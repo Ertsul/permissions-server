@@ -2,7 +2,6 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { ConfigService as CustomConfigService } from './config.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-// import { Dogs } from '../dogs/dogs.entity';
 
 @Global() // 注册为全局模块
 @Module({
