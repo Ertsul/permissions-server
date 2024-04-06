@@ -18,6 +18,7 @@ import { SessionMiddleware } from './middleware/session/session.middleware';
 import { VerificationCodeModule } from './module/verification-code/verification-code.module';
 import { TokenModule } from './module/token/token.module';
 import { VerifyTokenMiddleware } from './middleware/verify-token/verify-token.middleware';
+import { VerifyApiPermissionsMiddleware } from './middleware/verify-api-permissions/verify-api-permissions.middleware';
 
 @Module({
   imports: [
@@ -43,7 +44,21 @@ export class AppModule implements NestModule {
       .apply(VerifyTokenMiddleware)
       .exclude(
         {
-          path: 'login',
+          path: '/user/login',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'verification-code',
+          method: RequestMethod.GET,
+        },
+      )
+      .forRoutes('*');
+
+    consumer
+      .apply(VerifyApiPermissionsMiddleware)
+      .exclude(
+        {
+          path: '/user/login',
           method: RequestMethod.POST,
         },
         {
