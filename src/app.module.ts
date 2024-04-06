@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerMiddleware } from './middleware/logger/logger.middleware';
@@ -12,6 +17,7 @@ import { UserModule } from './module/user/user.module';
 import { SessionMiddleware } from './middleware/session/session.middleware';
 import { VerificationCodeModule } from './module/verification-code/verification-code.module';
 import { TokenModule } from './module/token/token.module';
+import { VerifyTokenMiddleware } from './middleware/verify-token/verify-token.middleware';
 
 @Module({
   imports: [
@@ -33,5 +39,18 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
     consumer.apply(SessionMiddleware).forRoutes('*');
+    consumer
+      .apply(VerifyTokenMiddleware)
+      .exclude(
+        {
+          path: 'login',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'verification-code',
+          method: RequestMethod.GET,
+        },
+      )
+      .forRoutes('*');
   }
 }
