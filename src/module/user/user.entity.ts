@@ -9,8 +9,7 @@ import {
 } from 'typeorm';
 import { RoleEntity } from '../role/role.entity';
 
-
-export const USER_TABLE = 'user'
+export const USER_TABLE = 'user';
 
 @Entity(USER_TABLE)
 export class UserEntity {

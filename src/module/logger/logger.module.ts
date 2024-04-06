@@ -4,6 +4,6 @@ import { LoggerController } from './logger.controller';
 
 @Module({
   providers: [LoggerService],
-  controllers: [LoggerController]
+  controllers: [LoggerController],
 })
 export class LoggerModule {}

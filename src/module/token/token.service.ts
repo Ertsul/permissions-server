@@ -2,7 +2,6 @@ import { Repository } from 'typeorm';
 import * as JWT from 'jsonwebtoken';
 import {
   ForbiddenException,
-  HttpException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';

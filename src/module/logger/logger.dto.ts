@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsInt, IsString } from 'class-validator';
+import { IsDate, IsInt, IsString } from 'class-validator';
 
 export class PermissionsDto {
   @ApiProperty({ description: 'ID', example: '1' })
